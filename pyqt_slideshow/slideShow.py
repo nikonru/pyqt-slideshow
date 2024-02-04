@@ -20,7 +20,7 @@ class SlideShow(QWidget):
     def __initUi(self, slideshow):
         self.__view = SingleImageGraphicsView()
         self.__view.setFrameStyle(QFrame.NoFrame)
-        self.__view.setAspectRatioMode(Qt.KeepAspectRatioByExpanding)
+        self.__view.setAspectRatioMode(Qt.KeepAspectRatio)
         self.__view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.__view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.__view.setStyleSheet('QGraphicsView { background: transparent; border: none; }')
