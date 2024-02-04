@@ -1,24 +1,25 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QButtonGroup, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QButtonGroup, QSizePolicy, QFrame
 from pyqt_slideshow.widgets.aniButton import AniRadioButton
 from pyqt_slideshow.widgets.graphicsView import SingleImageGraphicsView
 from pyqt_slideshow.widgets.svgButton import SvgButton
 
 
 class SlideShow(QWidget):
-    def __init__(self):
+    def __init__(self, slideshow=True):
         super().__init__()
         self.__initVal()
-        self.__initUi()
+        self.__initUi(slideshow)
 
     def __initVal(self):
         self.__btn = []
         self.__filenames = []
         self.__interval = 5000
+        self.__idx = 0
 
-    def __initUi(self):
+    def __initUi(self, slideshow):
         self.__view = SingleImageGraphicsView()
+        self.__view.setFrameStyle(QFrame.NoFrame)
         self.__view.setAspectRatioMode(Qt.KeepAspectRatioByExpanding)
         self.__view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.__view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -54,22 +55,26 @@ class SlideShow(QWidget):
         lay.addWidget(self.__btnWidget, 2, 0, 1, 1, Qt.AlignCenter)
         self.setLayout(lay)
 
-        self.__timer = QTimer(self)
-        self.__timer.setInterval(self.__interval)
-        self.__timer.timeout.connect(self.__nextByTimer)
-        self.__timer.start()
+        self.__timer = None
+        if slideshow:
+            self.__timer = QTimer(self)
+            self.__timer.setInterval(self.__interval)
+            self.__timer.timeout.connect(self.__nextByTimer)
+            self.__timer.start()
 
     def __showImageOfIdx(self, btn):
-        idx = self.__btnGroup.id(btn)
-        self.__view.setFilename(self.__filenames[idx])
-        self.__prevNextBtnToggled(idx)
-        self.__timer.start()
+        self.__idx = self.__btnGroup.id(btn)
+        self.__view.setFilename(self.__filenames[self.__idx])
+        self.__prevNextBtnToggled(self.__idx)
+        if self.__timer:
+            self.__timer.start()
 
     def __prev(self):
         if len(self.__filenames) > 0:
-            idx = max(0, self.__btnGroup.checkedId()-1)
-            self.__updateViewAndBtnBasedOnIdx(idx)
-            self.__timer.start()
+            self.__idx = max(0, self.__btnGroup.checkedId()-1)
+            self.__updateViewAndBtnBasedOnIdx(self.__idx)
+            if self.__timer:
+                self.__timer.start()
 
     def __nextByTimer(self):
         if len(self.__filenames) > 0:
@@ -78,11 +83,12 @@ class SlideShow(QWidget):
     def __nextClicked(self):
         if len(self.__filenames) > 0:
             self.__next()
-            self.__timer.start()
+            if self.__timer:
+                self.__timer.start()
 
     def __next(self):
-        idx = (self.__btnGroup.checkedId()+1) % len(self.__btnGroup.buttons())
-        self.__updateViewAndBtnBasedOnIdx(idx)
+        self.__idx = (self.__btnGroup.checkedId()+1) % len(self.__btnGroup.buttons())
+        self.__updateViewAndBtnBasedOnIdx(self.__idx)
 
     def __updateViewAndBtnBasedOnIdx(self, idx):
         self.__btnGroup.button(idx).setChecked(True)
@@ -94,7 +100,8 @@ class SlideShow(QWidget):
         self.__nextBtn.setEnabled(idx != len(self.__btnGroup.buttons())-1)
 
     def setInterval(self, milliseconds: int):
-        self.__timer.setInterval(milliseconds)
+        if self.__timer:
+            self.__timer.setInterval(milliseconds)
 
     def setFilenames(self, filenames: list):
         self.__filenames = filenames
@@ -116,10 +123,11 @@ class SlideShow(QWidget):
         self.__btnWidget.setVisible(f)
 
     def setTimerEnabled(self, f: bool):
-        if f:
-            self.__timer.start()
-        else:
-            self.__timer.stop()
+        if self.__timer:
+            if f:
+                self.__timer.start()
+            else:
+                self.__timer.stop()
 
     def setGradientEnabled(self, f: bool):
         self.__view.setGradientEnabled(f)
@@ -147,3 +155,6 @@ class SlideShow(QWidget):
     # to set the next nav button's size by user
     def getNextBtn(self):
         return self.__nextBtn
+
+    def get_image_index(self):
+        return self.__idx

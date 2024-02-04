@@ -16,7 +16,7 @@ setup(
     packages=find_packages(),
     package_data={'pyqt_slideshow.ico': ['right.svg', 'left.svg']},
     description='PyQt widget for slide show',
-    url='https://github.com/yjg30737/pyqt-slideshow.git',
+    url='https://github.com/nikonru/pyqt-slideshow.git',
     long_description_content_type='text/markdown',
     long_description=long_description,
     install_requires=[
