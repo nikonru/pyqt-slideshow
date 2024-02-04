@@ -102,9 +102,7 @@ class SvgAbstractButton(QAbstractButton):
         self.setStyleSheet(self.__btn_style)
 
     def setIcon(self, icon: str):
-        cur_dir = os.path.dirname(os.path.abspath(__file__))
-        par_dir = os.path.abspath(os.path.join(cur_dir, os.pardir))
-        self.__icon = os.path.join(par_dir, icon).replace(os.path.sep, posixpath.sep)
+        self.__icon = icon
         self.__styleInit()
 
     def eventFilter(self, obj, e):
