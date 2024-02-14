@@ -17,11 +17,17 @@ class SingleImageGraphicsView(QGraphicsView):
 
     def setFilename(self, filename: str):
         self._p = QPixmap(filename)
-        self._scene = QGraphicsScene()
-        self._item = self._scene.addPixmap(self._p)
+        self._setPixmap(self._p)
 
+    def setPixmap(self, p):
+        self._setPixmap(p)
+
+    def _set_scene(self):
+        p = self._p.scaled(self.width(), self.height(), self.__aspectRatioMode, Qt.SmoothTransformation)
+        self._scene = QGraphicsScene()
+        self._item = self._scene.addPixmap(p)
+        self._scene.addItem(self._item)
         self.setScene(self._scene)
-        self.fitInView(self._item, self.__aspectRatioMode)
 
     def setAspectRatioMode(self, mode):
         self.__aspectRatioMode = mode
@@ -40,7 +46,7 @@ class SingleImageGraphicsView(QGraphicsView):
 
     def resizeEvent(self, e):
         if self._item:
-            self.fitInView(self.sceneRect(), self.__aspectRatioMode)
+            self._set_scene()
             if self.__gradient_enabled:
                 self.__setGradient()
         return super().resizeEvent(e)
