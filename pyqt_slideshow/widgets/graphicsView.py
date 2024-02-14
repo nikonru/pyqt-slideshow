@@ -17,10 +17,7 @@ class SingleImageGraphicsView(QGraphicsView):
 
     def setFilename(self, filename: str):
         self._p = QPixmap(filename)
-        self._setPixmap(self._p)
-
-    def setPixmap(self, p):
-        self._setPixmap(p)
+        self._set_scene()
 
     def _set_scene(self):
         p = self._p.scaled(self.width(), self.height(), self.__aspectRatioMode, Qt.SmoothTransformation)
